@@ -60,7 +60,7 @@ async def ver_meus_produtos(
 
 
 @router.get(
-    "/{id}", response_model=schemas.ProdutoResponse, tags=["Produtos - Publico"]
+    "/{id}", response_model=schemas.ProdutoResponse, tags=["Produtos - Publico(Logado)"]
 )
 async def ver_produto_por_id(
     produto_id: int,

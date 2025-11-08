@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from .. import crud, models, schemas
 from ..deps import get_db, get_current_user, get_user_admin
 
-router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
+router = APIRouter(prefix="/usuarios")
 
 
 @router.post(
