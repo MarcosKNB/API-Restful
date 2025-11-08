@@ -19,7 +19,7 @@ def create_produto(
     db: Session = Depends(get_db),
     current_user: models.Usuario = Depends(get_current_user),
 ):
-    """Cria um novo produto (apenas para produtores)."""
+    """Produtor - Cria um novo produto"""
     if current_user.tipo != schemas.TipoUsuario.produtor:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Apenas produtor cria produto"
@@ -34,7 +34,7 @@ def create_produto(
     tags=["Produtos - Publico"],
 )
 def read_produtos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """Retorna uma lista de todos os produtos publico."""
+    """Publico - Retorna uma lista de todos os produtos"""
     produtos = crud.get_produtos(db, skip=skip, limit=limit)
     return produtos
 
@@ -48,7 +48,7 @@ async def ver_meus_produtos(
     current_user: models.Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Retorna a lista de produtos do produtor logado."""
+    """Retorna a lista de produtos do produtor logado"""
 
     if current_user.tipo != schemas.TipoUsuario.produtor:
         raise HTTPException(
@@ -67,6 +67,7 @@ async def ver_produto_por_id(
     current_user: models.Usuario = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Qualquer logado - Visualizar produto especifico do id"""
     produto = crud.get_produto(db, produto_id=produto_id)
     if produto is None:
         raise HTTPException(
@@ -87,7 +88,7 @@ async def update_meu_produto(
     db_produto: models.Produto = Depends(get_produto_e_verificar_dono),
     db: Session = Depends(get_db),
 ):
-    """Atualiza um produto do produtor logado."""
+    """Atualiza um produto do produtor logado pelo id"""
 
     return crud.update_produto(db=db, produto=db_produto, produto_update=produto_update)
 
@@ -102,6 +103,6 @@ async def delete_meu_produto(
     db_produto: models.Produto = Depends(get_produto_e_verificar_dono),
     db: Session = Depends(get_db),
 ):
-    """Deleta um produto do produtor logado."""
+    """Deleta um produto do produtor logado pelo id"""
 
     return crud.delete_produto(db=db, produto=db_produto)

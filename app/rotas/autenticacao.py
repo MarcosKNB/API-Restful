@@ -13,7 +13,7 @@ router = APIRouter(tags=["Autenticacao"])
 async def login_para_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    """Gera um token de acesso (login)."""
+    """Login - Gera um token de acesso"""
 
     usuario = crud.get_usuario_por_email(db, email=form_data.username)
 

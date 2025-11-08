@@ -19,6 +19,7 @@ def get_hash_senha(senha: str) -> str:
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None):
+    """Gera um token de acesso temporario"""
     to_encode = data.copy()
 
     if expires_delta:

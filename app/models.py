@@ -4,6 +4,8 @@ from .database import Base
 from .schemas import TipoUsuario, TipoProduto
 from decimal import Decimal
 
+# ---Modelos para o banco de dados---
+
 
 class Usuario(Base):
     __tablename__: str = "usuarios"

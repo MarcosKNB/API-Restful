@@ -8,6 +8,8 @@ from .database import SessionLocal
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# ---Dependencias para execucao---
+
 
 def get_db():
     db = SessionLocal()
@@ -20,6 +22,8 @@ def get_db():
 async def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
+    """Verifica usuario logado"""
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Credenciais não validadas",
@@ -43,6 +47,7 @@ async def get_current_user(
 
 
 async def get_user_admin(current_user: models.Usuario = Depends(get_current_user)):
+    """Verifica se o usuario 'e admin"""
     if current_user.tipo != models.TipoUsuario.admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -56,6 +61,8 @@ async def get_produto_e_verificar_dono(
     db: Session = Depends(get_db),
     current_user: models.Usuario = Depends(get_current_user),
 ) -> models.Produto:
+    """Verifica se o produto existe e se o produto pertence ao usuario logado"""
+
     db_produto = crud.get_produto(db, produto_id=produto_id)
 
     if db_produto is None:

@@ -3,6 +3,8 @@ from .security import get_hash_senha
 
 from . import models, schemas
 
+# ---Requisicoes para o banco de dados---
+
 
 def get_usuario(db: Session, usuario_id: int):
     return db.query(models.Usuario).filter(models.Usuario.id == usuario_id).first()

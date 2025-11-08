@@ -6,20 +6,20 @@ from .rotas import autenticacao, usuarios, produtos
 metadata_obj.create_all(bind=engine)
 app = FastAPI
 
-# --- Criação da Aplicação ---
+# --- Criacao da Aplicacao ---
 app = FastAPI(
     title="API Marketplace Agro",
-    description="API para gerenciar usuários (produtores/compradores/administradores) e produtos agrícolas.",
-    version="1.0.0",
+    description="API para gerenciar usuarios produtos agricolas",
 )
 
-# --- Configuração de Autenticação ---
+# --- Configuracao de rotas ---
 
 app.include_router(autenticacao.router)
 app.include_router(usuarios.router)
 app.include_router(produtos.router)
 
 
+# Verificar se esta no ar
 @app.get("/", tags=["Health Check"])
 async def root():
-    return {"message": "API Marketplace Agro está funcionando!"}
+    return {"message": "API Marketplace Agro esta funcionando!"}

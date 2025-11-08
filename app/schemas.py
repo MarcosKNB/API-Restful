@@ -18,7 +18,7 @@ class TipoProduto(str, Enum):
     laticinios = "laticinios"
 
 
-# --- Schemas de Usuário ---
+# --- Schemas de Usuario ---
 
 
 class UsuarioBase(BaseModel):
@@ -47,12 +47,29 @@ class UsuarioResponse(UsuarioBase):
     id: int
 
 
+# --- Schemas de Produto ---
+
+
 class ProdutoBase(BaseModel):
     nome: str = Field(..., min_length=3, max_length=100)
     descricao: str | None = Field(None, max_length=500)
     preco: Decimal = Field(..., max_digits=10, decimal_places=2, gt=Decimal("0.00"))
     quantidade: int = Field(..., ge=0)
     categoria: TipoProduto
+    localizacao: str | None = Field(None)
+
+    class Config:
+        from_attributes: bool = True
+
+
+class ProdutoUpdate(BaseModel):
+    nome: str | None = Field(None, min_length=3, max_length=100)
+    descricao: str | None = Field(None, max_length=500)
+    preco: Decimal | None = Field(
+        None, max_digits=10, decimal_places=2, gt=Decimal("0.00")
+    )
+    quantidade: int | None = Field(None, ge=0)
+    categoria: TipoProduto | None = None
     localizacao: str | None = Field(None)
 
     class Config:
@@ -68,7 +85,7 @@ class ProdutoResponse(ProdutoBase):
     produtor_id: int
 
 
-# --- Schemas de Autenticação ---
+# --- Schemas de Autenticacao ---
 
 
 class Token(BaseModel):
@@ -78,20 +95,3 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: str | None = None
-
-
-# --- Schemas de Update ---
-
-
-class ProdutoUpdate(BaseModel):
-    nome: str | None = Field(None, min_length=3, max_length=100)
-    descricao: str | None = Field(None, max_length=500)
-    preco: Decimal | None = Field(
-        None, max_digits=10, decimal_places=2, gt=Decimal("0.00")
-    )
-    quantidade: int | None = Field(None, ge=0)
-    categoria: TipoProduto | None = None
-    localizacao: str | None = Field(None)
-
-    class Config:
-        from_attributes: bool = True

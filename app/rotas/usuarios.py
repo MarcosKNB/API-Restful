@@ -14,7 +14,7 @@ router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
     tags=["Usuarios"],
 )
 def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
-    """Cria um novo usuário."""
+    """Cria um novo usuario"""
 
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:
@@ -24,7 +24,7 @@ def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)
 
 @router.get("/me", response_model=schemas.UsuarioResponse, tags=["Usuarios"])
 async def read_users_me(current_user: models.Usuario = Depends(get_current_user)):
-    """Retorna os dados do usuário logado."""
+    """Retorna os dados do usuario logado"""
     return current_user
 
 
@@ -39,7 +39,7 @@ def read_usuarios(
     db: Session = Depends(get_db),
     admin: models.Usuario = Depends(get_user_admin),
 ):
-    """(Admin) Retorna uma lista de todos os usuários."""
+    """Admin - Retorna uma lista de todos os usurios"""
     usuarios = crud.get_usuarios(db, skip=skip, limit=limit)
     return usuarios
 
@@ -54,6 +54,7 @@ def delete_usuario(
     db: Session = Depends(get_db),
     admin: models.Usuario = Depends(get_user_admin),
 ):
+    """Admin - Deleta usuario especifico pelo id"""
     if usuario_id == admin.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
