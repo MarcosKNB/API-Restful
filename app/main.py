@@ -4,7 +4,6 @@ from .rotas import autenticacao, usuarios, produtos
 
 # Cria as tabelas no banco de dados
 metadata_obj.create_all(bind=engine)
-app = FastAPI
 
 # --- Criacao da Aplicacao ---
 app = FastAPI(

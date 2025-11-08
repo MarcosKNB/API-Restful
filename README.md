@@ -54,25 +54,12 @@ As rotas cadastradas no projeto estão em `app/rotas/`:
 
 - Em `app/models.py` os tipos `TipoUsuario` e `TipoProduto` são armazenados como Enum (p.ex. `"produtor"`, `"comprador"`).
 - A função de autenticação retorna um dicionário com `access_token` e `token_type` (ex: `{"access_token": "...", "token_type": "bearer"}`) — isso já está compatível com o `OAuth2PasswordBearer` usado pelo FastAPI.
-- Em `app/main.py` há uma linha redundante `app = FastAPI` (sem parênteses) antes da criação correta da instância `app = FastAPI(...)`. Isso não causa erro porque em seguida a variável é sobrescrita, mas é aconselhável remover a linha redundante para manter o código limpo:
-
-```py
-# Remover ou alterar:
-app = FastAPI
-
-# Manter:
-app = FastAPI(
-    title="API Marketplace Agro",
-    description="API para gerenciar usuarios produtos agricolas",
-)
-```
 
 - Se você estiver enfrentando o erro "Invalid conditional operand of type \"ColumnElement[bool]\"" isso normalmente significa que em algum ponto do código você está tentando usar uma expressão SQLAlchemy (por exemplo, `some_column == value`) diretamente numa condição Python (`if <sql expression>:`). A correção é garantir que a dependência que retorna o usuário autenticado (`get_current_user` / `getCurrentUser`) devolva uma instância ORM (atributos já resolvidos em valores Python) e que comparações com `Enum` usem o membro correto ou `.value` quando necessário. Posso ajudar a corrigir esse ponto se você me enviar o arquivo que implementa a dependência de autenticação (provavelmente `app/security.py` ou `app/deps.py`).
 
 ## Próximos passos sugeridos
 
-1. Remover a linha redundante em `app/main.py` para limpar o código.
-2. Se o erro de `ColumnElement[bool]` persistir, envie o arquivo que implementa a dependência de usuário atual (por exemplo, `app/deps.py` ou `app/security.py`) e eu corrijo a lógica.
+1. Se o erro de `ColumnElement[bool]` persistir, envie o arquivo que implementa a dependência de usuário atual (por exemplo, `app/deps.py` ou `app/security.py`) e eu corrijo a lógica.
 
 ---
 
