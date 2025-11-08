@@ -1,44 +1,79 @@
-API Marketplace Agro
+# API Marketplace Agro
 
-Uma API RESTful robusta, construída com FastAPI e SQLAlchemy, para gerenciar um marketplace agrícola. A aplicação permite o cadastro de usuários com diferentes papéis (produtor, comprador, admin) e o gerenciamento de produtos, com um sistema de autenticação seguro baseado em JWT.
+Projeto simples em FastAPI para gerenciar usuários e produtos agrícolas (produtores e compradores).
 
-🚀 Funcionalidades Principais
+## Visão geral
 
-    Autenticação de Usuários: Sistema de login completo com tokens de acesso JWT (OAuth2).
+- Framework: FastAPI
+- Banco: SQLAlchemy (configurado em `app/database.py`)
+- Autenticação: JWT (rota `/token` produz `access_token`)
 
-    Autorização por Papel (Roles):
+O projeto fornece rotas para autenticação, gerenciamento de usuários e produtos.
 
-        Admins: Podem listar e deletar qualquer usuário.
+## Dependências
 
-        Produtores: Podem criar, ler, atualizar e deletar seus próprios produtos.
+As dependências estão em `requirements.txt`. Principais pacotes:
 
-        Compradores: Podem se cadastrar e listar produtos.
+- fastapi
+- uvicorn[standard]
+- sqlalchemy
+- mysql-connector-python
+- passlib
+- python-jose[cryptography]
+- email-validator
+- python-multipart
 
-    Proteção de Rotas: Endpoints seguros que só podem ser acessados pelo "dono" do recurso ou por um admin.
+Instalar dependências:
 
-    Validação de Dados: Validação automática de requisições e respostas usando Pydantic.
+```bash
+python3 -m pip install -r requirements.txt
+```
 
-    Pronto para Docker: Configuração completa com docker-compose.yml para rodar a API e o banco de dados em containers.
+## Como rodar (desenvolvimento)
 
-    Documentação Automática: Documentação interativa da API gerada automaticamente pelo FastAPI (Swagger UI e ReDoc).
+Rodar a API com uvicorn:
 
-🛠️ Tecnologias Utilizadas
+```bash
+uvicorn "app.main:app" --reload --host 0.0.0.0 --port 8000
+```
 
-Aqui estão as principais ferramentas e bibliotecas usadas neste projeto.
+Depois disso a API estará disponível em `http://127.0.0.1:8000`.
 
-    Linguagem: Python 3.10+
+Endpoints úteis:
 
-    SGBD (Banco de Dados): MariaDB (v10.11+)
+- Health check: `GET /` — retorna mensagem de funcionamento.
+- Token (login): `POST /token` — usa `OAuth2PasswordRequestForm` (fields: username=email, password) e retorna JSON com `access_token` e `token_type`.
 
-Bibliotecas Principais
+As rotas cadastradas no projeto estão em `app/rotas/`:
 
-Biblioteca	Versão (Exemplo)	Propósito
-fastapi	~0.110.0	O framework principal da API.
-uvicorn	~0.29.0	O servidor (ASGI) que executa a aplicação.
-sqlalchemy	~2.0.29	O ORM (Mapeador Objeto-Relacional) para interagir com o banco.
-mysql-connector-python	~8.4.0	O "driver" que permite ao SQLAlchemy se comunicar com o MariaDB/MySQL.
-passlib	~1.7.4	Para hashear e verificar senhas de forma segura (usando sha256_crypt).
-python-jose[cryptography]	~3.3.0	Para criar e validar os tokens de login (JWT).
-pydantic	~2.7.0	Para validação de dados, usado extensivamente nos schemas.
-python-multipart	~0.0.9	Necessário para o FastAPI ler dados de formulário (usado no login OAuth2).
-email-validator	~2.1.1	Usado pelo Pydantic para validar o tipo EmailStr.
+- `autenticacao.py` — rota `/token` para autenticação (gera JWT)
+- `usuarios.py` — rotas relacionadas a usuários
+- `produtos.py` — rotas relacionadas a produtos
+
+## Observações / notas técnicas
+
+- Em `app/models.py` os tipos `TipoUsuario` e `TipoProduto` são armazenados como Enum (p.ex. `"produtor"`, `"comprador"`).
+- A função de autenticação retorna um dicionário com `access_token` e `token_type` (ex: `{"access_token": "...", "token_type": "bearer"}`) — isso já está compatível com o `OAuth2PasswordBearer` usado pelo FastAPI.
+- Em `app/main.py` há uma linha redundante `app = FastAPI` (sem parênteses) antes da criação correta da instância `app = FastAPI(...)`. Isso não causa erro porque em seguida a variável é sobrescrita, mas é aconselhável remover a linha redundante para manter o código limpo:
+
+```py
+# Remover ou alterar:
+app = FastAPI
+
+# Manter:
+app = FastAPI(
+    title="API Marketplace Agro",
+    description="API para gerenciar usuarios produtos agricolas",
+)
+```
+
+- Se você estiver enfrentando o erro "Invalid conditional operand of type \"ColumnElement[bool]\"" isso normalmente significa que em algum ponto do código você está tentando usar uma expressão SQLAlchemy (por exemplo, `some_column == value`) diretamente numa condição Python (`if <sql expression>:`). A correção é garantir que a dependência que retorna o usuário autenticado (`get_current_user` / `getCurrentUser`) devolva uma instância ORM (atributos já resolvidos em valores Python) e que comparações com `Enum` usem o membro correto ou `.value` quando necessário. Posso ajudar a corrigir esse ponto se você me enviar o arquivo que implementa a dependência de autenticação (provavelmente `app/security.py` ou `app/deps.py`).
+
+## Próximos passos sugeridos
+
+1. Remover a linha redundante em `app/main.py` para limpar o código.
+2. Se o erro de `ColumnElement[bool]` persistir, envie o arquivo que implementa a dependência de usuário atual (por exemplo, `app/deps.py` ou `app/security.py`) e eu corrijo a lógica.
+
+---
+
+Se quiser, eu já aplico a remoção da linha redundante em `app/main.py` e/ou corrijo a dependência que produz o `ColumnElement[bool]` — diga qual opção prefere.
