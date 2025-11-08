@@ -81,3 +81,11 @@ def delete_produto(db: Session, produto: models.Produto):
     db.delete(produto)
     db.commit()
     return produto
+
+
+def delete_usuario(db: Session, usuario_id: int):
+    usuario = get_usuario(db, usuario_id=usuario_id)
+    if usuario:
+        db.delete(usuario)
+        db.commit()
+    return usuario

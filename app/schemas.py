@@ -1,9 +1,9 @@
 from decimal import Decimal
 from pydantic import BaseModel, Field, EmailStr, field_validator
-from typing import Optional
 from enum import Enum
-
 import re
+
+# --- Enums ---
 
 
 class TipoUsuario(str, Enum):
@@ -18,11 +18,14 @@ class TipoProduto(str, Enum):
     laticinios = "laticinios"
 
 
+# --- Schemas de Usuário ---
+
+
 class UsuarioBase(BaseModel):
     nome: str = Field(..., min_length=3)
     email: EmailStr
     tipo: TipoUsuario
-    localizacao: Optional[str] = Field(None, max_length=100)
+    localizacao: str | None = Field(None, max_length=100)
 
     class Config:
         from_attributes = True
@@ -43,32 +46,29 @@ class UsuarioCreate(UsuarioBase):
 class UsuarioResponse(UsuarioBase):
     id: int
 
-    class Config:
-        from_attributes = True
 
-
-class Produto(BaseModel):
+class ProdutoBase(BaseModel):
     nome: str = Field(..., min_length=3, max_length=100)
-    descricao: Optional[str] = Field(None, max_length=500)
+    descricao: str | None = Field(None, max_length=500)
     preco: Decimal = Field(..., max_digits=10, decimal_places=2, gt=Decimal("0.00"))
     quantidade: int = Field(..., ge=0)
     categoria: TipoProduto
-    localizacao: Optional[str] = Field(None)
+    localizacao: str | None = Field(None)
 
     class Config:
         from_attributes = True
 
 
-class ProdutoCreate(Produto):
-    pass
+class ProdutoCreate(ProdutoBase):
+    produtor_id: int = Field(...)
 
 
-class ProdutoResponse(Produto):
+class ProdutoResponse(ProdutoBase):
     id: int
     produtor_id: int
 
-    class Config:
-        from_attributes = True
+
+# --- Schemas de Autenticação ---
 
 
 class Token(BaseModel):
@@ -77,18 +77,21 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    email: str | None = None
+
+
+# --- Schemas de Update ---
 
 
 class ProdutoUpdate(BaseModel):
-    nome: Optional[str] = Field(None, min_length=3, max_length=100)
-    descricao: Optional[str] = Field(None, max_length=500)
-    preco: Optional[Decimal] = Field(
+    nome: str | None = Field(None, min_length=3, max_length=100)
+    descricao: str | None = Field(None, max_length=500)
+    preco: Decimal | None = Field(
         None, max_digits=10, decimal_places=2, gt=Decimal("0.00")
     )
-    quantidade: Optional[int] = Field(None, ge=0)
-    categoria: Optional[TipoProduto] = None
-    localizacao: Optional[str] = Field(None)
+    quantidade: int | None = Field(None, ge=0)
+    categoria: TipoProduto | None = None
+    localizacao: str | None = Field(None)
 
     class Config:
         from_attributes = True

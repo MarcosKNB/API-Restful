@@ -1,0 +1,90 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+
+from .. import crud, models, schemas
+from ..deps import get_db, get_current_user, get_produto_e_verificar_dono
+
+router = APIRouter(prefix="/produtos")
+
+
+@router.post(
+    "/",
+    response_model=schemas.ProdutoResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Produtos - Gerenciamento"],
+)
+def create_produto(
+    produto: schemas.ProdutoCreate,
+    db: Session = Depends(get_db),
+    current_user: models.Usuario = Depends(get_current_user),
+):
+    """Cria um novo produto (apenas para produtores)."""
+    if current_user.tipo != schemas.TipoUsuario.produtor:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Apenas produtor cria produto"
+        )
+
+    return crud.create_produto(db=db, produto=produto, produtor_id=current_user.id)
+
+
+@router.get(
+    "/",
+    response_model=List[schemas.ProdutoResponse],
+    tags=["Produtos - Publico"],
+)
+def read_produtos(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Retorna uma lista de todos os produtos publico."""
+    produtos = crud.get_produtos(db, skip=skip, limit=limit)
+    return produtos
+
+
+@router.get(
+    "/me",
+    response_model=List[schemas.ProdutoResponse],
+    tags=["Produtos - Gerenciamento"],
+)
+async def ver_meus_produtos(
+    current_user: models.Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Retorna a lista de produtos do produtor logado."""
+
+    if current_user.tipo != schemas.TipoUsuario.produtor:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Apenas produtores podem ver 'meus produtos'",
+        )
+
+    return crud.get_produtos_por_produtor(db, produtor_id=current_user.id)
+
+
+@router.put(
+    "/{produto_id}",
+    response_model=schemas.ProdutoResponse,
+    tags=["Produtos - Gerenciamento"],
+)
+async def update_meu_produto(
+    produto_id: int,
+    produto_update: schemas.ProdutoUpdate,
+    db_produto: models.Produto = Depends(get_produto_e_verificar_dono),
+    db: Session = Depends(get_db),
+):
+    """Atualiza um produto do produtor logado."""
+
+    return crud.update_produto(db=db, produto=db_produto, produto_update=produto_update)
+
+
+@router.delete(
+    "/{produto_id}",
+    response_model=schemas.ProdutoResponse,
+    tags=["Produtos - Gerenciamento"],
+)
+async def delete_meu_produto(
+    produto_id: int,
+    db_produto: models.Produto = Depends(get_produto_e_verificar_dono),
+    db: Session = Depends(get_db),
+):
+    """Deleta um produto do produtor logado."""
+
+    return crud.delete_produto(db=db, produto=db_produto)
