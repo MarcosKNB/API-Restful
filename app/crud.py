@@ -68,8 +68,18 @@ def update_produto(
 ):
     update_data = produto_update.model_dump(exclude_unset=True)
 
-    for key, value in update_data.items():
-        setattr(produto, key, value)
+    if "nome" in update_data:
+        produto.nome = update_data["nome"]
+    if "descricao" in update_data:
+        produto.descricao = update_data["descricao"]
+    if "preco" in update_data:
+        produto.preco = update_data["preco"]
+    if "quantidade" in update_data:
+        produto.quantidade = update_data["quantidade"]
+    if "categoria" in update_data:
+        produto.categoria = update_data["categoria"]
+    if "localizacao" in update_data:
+        produto.localizacao = update_data["localizacao"]
 
     db.add(produto)
     db.commit()

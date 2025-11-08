@@ -1,8 +1,7 @@
-from annotated_types import Timezone
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+from jose import jwt
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Any
 
 SECRET_KEY = "c42363b991c706faed9219dcb76ccdfa309c7cb3489c193b1a08cccebbaeec50"
 ALGORITHM = "HS256"
@@ -19,7 +18,7 @@ def get_hash_senha(senha: str) -> str:
     return pwd_context.hash(senha)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None):
     to_encode = data.copy()
 
     if expires_delta:

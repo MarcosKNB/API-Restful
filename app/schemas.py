@@ -28,14 +28,14 @@ class UsuarioBase(BaseModel):
     localizacao: str | None = Field(None, max_length=100)
 
     class Config:
-        from_attributes = True
+        from_attributes: bool = True
 
 
 class UsuarioCreate(UsuarioBase):
     senha: str = Field(..., min_length=8)
 
     @field_validator("senha")
-    def validarSenha(cls, value):
+    def validarSenha(cls, value: str) -> str:
         if not re.search(r"[a-zA-Z]", value):
             raise ValueError("senha deve conter pelo menos uma letra")
         if not re.search(r"[\d]", value):
@@ -56,7 +56,7 @@ class ProdutoBase(BaseModel):
     localizacao: str | None = Field(None)
 
     class Config:
-        from_attributes = True
+        from_attributes: bool = True
 
 
 class ProdutoCreate(ProdutoBase):
@@ -94,4 +94,4 @@ class ProdutoUpdate(BaseModel):
     localizacao: str | None = Field(None)
 
     class Config:
-        from_attributes = True
+        from_attributes: bool = True

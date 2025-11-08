@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
 
 from .. import crud, models, schemas
 from ..deps import get_db, get_current_user, get_user_admin
@@ -31,7 +30,7 @@ async def read_users_me(current_user: models.Usuario = Depends(get_current_user)
 
 @router.get(
     "/",
-    response_model=List[schemas.UsuarioResponse],
+    response_model=list[schemas.UsuarioResponse],
     tags=["Usuarios - Admin"],
 )
 def read_usuarios(

@@ -59,6 +59,23 @@ async def ver_meus_produtos(
     return crud.get_produtos_por_produtor(db, produtor_id=current_user.id)
 
 
+@router.get(
+    "/{id}", response_model=schemas.ProdutoResponse, tags=["Produtos - Publico"]
+)
+async def ver_produto_por_id(
+    produto_id: int,
+    current_user: models.Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    produto = crud.get_produto(db, produto_id=produto_id)
+    if produto is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Produto nao encontrado na base de dados",
+        )
+    return produto
+
+
 @router.put(
     "/{produto_id}",
     response_model=schemas.ProdutoResponse,
