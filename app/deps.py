@@ -33,16 +33,24 @@ async def get_current_user(
         payload = jwt.decode(
             token, security.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        email: str = payload.get("sub")
+        email = payload.get("sub")
         if email is None:
             raise credentials_exception
         token_data = schemas.TokenData(email=email)
     except JWTError:
         raise credentials_exception
 
-    usuario = crud.get_usuario_por_email(db, email=token_data.email)
+    # token_data.email já foi validado como não-None acima
+    usuario = crud.get_usuario_por_email(db, email=email)
     if usuario is None:
         raise credentials_exception
+    # Garantir que o atributo 'tipo' seja uma instância de Enum Python (TipoUsuario)
+    # Alguns backends/versões do SQLAlchemy podem devolver o valor cru; normalizamos aqui
+    try:
+        usuario.tipo = schemas.TipoUsuario(usuario.tipo)
+    except Exception:
+        # se já for o Enum ou valor inválido, mantemos como está
+        pass
     return usuario
 
 

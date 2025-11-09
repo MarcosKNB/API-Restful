@@ -1,64 +1,123 @@
 # API Marketplace Agro
 
-Projeto simples em FastAPI para gerenciar usuários e produtos agrícolas (produtores e compradores).
+A RESTful API built with FastAPI for managing an agricultural marketplace where producers can list their products and users can browse available agricultural products.
 
-## Visão geral
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
+[![Python](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-- Framework: FastAPI
-- Banco: SQLAlchemy (configurado em `app/database.py`)
-- Autenticação: JWT (rota `/token` produz `access_token`)
+## Features
 
-O projeto fornece rotas para autenticação, gerenciamento de usuários e produtos.
+- 🔐 **Secure Authentication**: JWT-based authentication system
+- 👤 **User Management**: Support for different user types (producers and regular users)
+- 📦 **Product Management**: CRUD operations for agricultural products
+- 🔍 **Product Discovery**: Public endpoints for browsing available products
+- 🐳 **Docker Support**: Easy deployment with Docker and Docker Compose
+- 📊 **MariaDB Database**: Reliable data storage with MariaDB
+- 📚 **API Documentation**: Auto-generated interactive API documentation with Swagger UI
 
-## Dependências
+## Getting Started
 
-As dependências estão em `requirements.txt`. Principais pacotes:
+### Prerequisites
 
-- fastapi
-- uvicorn[standard]
-- sqlalchemy
-- mysql-connector-python
-- passlib
-- python-jose[cryptography]
-- email-validator
-- python-multipart
+- Docker and Docker Compose
+- Python 3.6 or higher (for local development)
 
-Instalar dependências:
+### Installation
 
-```bash
-python3 -m pip install -r requirements.txt
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MarcosKNB/API-Restful.git
+   cd API-Restful
+   ```
+
+2. Create a `.env` file in the root directory with the following variables:
+   ```env
+   DB_USER=your_db_user
+   DB_PASSWORD=your_db_password
+   DB_HOST=db
+   DB_PORT=3306
+   DB_NAME=your_db_name
+   MARIADB_ROOT_PASSWORD=your_root_password
+   ```
+
+3. Build and start the containers:
+   ```bash
+   docker compose up -d
+   ```
+
+The API will be available at `http://localhost:8000`
+
+### Local Development Setup
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the development server:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+## API Documentation
+
+Once the server is running, you can access:
+
+- Interactive API documentation (Swagger UI): `http://localhost:8000/docs`
+- Alternative API documentation (ReDoc): `http://localhost:8000/redoc`
+
+## Main Endpoints
+
+### Authentication
+- `POST /token` - Get access token
+- `POST /usuarios/` - Register new user
+
+### Products
+- `GET /produtos/` - List all products (public)
+- `POST /produtos/` - Create new product (producers only)
+- `GET /produtos/me` - List producer's products
+- `GET /produtos/{id}` - Get product details
+- `PUT /produtos/{id}` - Update product (owner only)
+- `DELETE /produtos/{id}` - Delete product (owner only)
+
+### Users
+- `GET /usuarios/me` - Get current user info
+- `PUT /usuarios/me` - Update current user info
+
+## Project Structure
+
+```
+.
+├── app/
+│   ├── rotas/           # API routes
+│   ├── crud.py         # Database operations
+│   ├── database.py     # Database configuration
+│   ├── deps.py         # Dependencies and utilities
+│   ├── main.py         # Application entry point
+│   ├── models.py       # SQLAlchemy models
+│   ├── schemas.py      # Pydantic schemas
+│   └── security.py     # Authentication logic
+├── compose.yaml        # Docker Compose configuration
+├── Dockerfile         # Docker configuration
+├── requirements.txt   # Python dependencies
+└── README.md         # Project documentation
 ```
 
-## Como rodar (desenvolvimento)
+## Contributing
 
-Rodar a API com uvicorn:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```bash
-uvicorn "app.main:app" --reload --host 0.0.0.0 --port 8000
-```
+## Support
 
-Depois disso a API estará disponível em `http://127.0.0.1:8000`.
+If you have any questions or run into issues, please [open an issue](https://github.com/MarcosKNB/API-Restful/issues) in the GitHub repository.
 
-Endpoints úteis:
+## License
 
-- Health check: `GET /` — retorna mensagem de funcionamento.
-- Token (login): `POST /token` — usa `OAuth2PasswordRequestForm` (fields: username=email, password) e retorna JSON com `access_token` e `token_type`.
-
-As rotas cadastradas no projeto estão em `app/rotas/`:
-
-- `autenticacao.py` — rota `/token` para autenticação (gera JWT)
-- `usuarios.py` — rotas relacionadas a usuários
-- `produtos.py` — rotas relacionadas a produtos
-
-## Observações / notas técnicas
-
-- Em `app/models.py` os tipos `TipoUsuario` e `TipoProduto` são armazenados como Enum (p.ex. `"produtor"`, `"comprador"`).
-- A função de autenticação retorna um dicionário com `access_token` e `token_type` (ex: `{"access_token": "...", "token_type": "bearer"}`) — isso já está compatível com o `OAuth2PasswordBearer` usado pelo FastAPI.
-
-- Se você estiver enfrentando o erro "Invalid conditional operand of type \"ColumnElement[bool]\"" isso normalmente significa que em algum ponto do código você está tentando usar uma expressão SQLAlchemy (por exemplo, `some_column == value`) diretamente numa condição Python (`if <sql expression>:`). A correção é garantir que a dependência que retorna o usuário autenticado (`get_current_user` / `getCurrentUser`) devolva uma instância ORM (atributos já resolvidos em valores Python) e que comparações com `Enum` usem o membro correto ou `.value` quando necessário. Posso ajudar a corrigir esse ponto se você me enviar o arquivo que implementa a dependência de autenticação (provavelmente `app/security.py` ou `app/deps.py`).
-
-## Próximos passos sugeridos
-
-1. Se o erro de `ColumnElement[bool]` persistir, envie o arquivo que implementa a dependência de usuário atual (por exemplo, `app/deps.py` ou `app/security.py`) e eu corrijo a lógica.
-
----
+This project is open-source and available under the MIT License.
