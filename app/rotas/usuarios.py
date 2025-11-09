@@ -11,10 +11,14 @@ router = APIRouter(prefix="/usuarios")
     "/",
     response_model=schemas.UsuarioResponse,
     status_code=status.HTTP_201_CREATED,
-    tags=["Usuarios"],
+    tags=["Usuarios - Admin"],
 )
-def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
-    """Cria um novo usuario"""
+def create_usuario(
+    usuario: schemas.UsuarioCreate,
+    db: Session = Depends(get_db),
+    admin: models.Usuario = Depends(get_user_admin),
+):
+    """Admin - Cria um novo usuario"""
 
     db_usuario = crud.get_usuario_por_email(db, email=usuario.email)
     if db_usuario:

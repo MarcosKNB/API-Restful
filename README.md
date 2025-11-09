@@ -66,6 +66,9 @@ The API will be available at `http://localhost:8000`
    uvicorn app.main:app --reload
    ```
 
+## Admin de teste
+- Arquivo teste.py, so rodar
+
 ## API Documentation
 
 Once the server is running, you can access:
@@ -109,6 +112,10 @@ Once the server is running, you can access:
 ├── requirements.txt   # Python dependencies
 └── README.md         # Project documentation
 ```
+
+## Problemas
+
+Ao rodar no docker verifique se o seu proprio banco de dados esta rodando, se sim, desligue.
 
 ## Contributing
 
