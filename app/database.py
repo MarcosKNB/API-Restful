@@ -1,15 +1,24 @@
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import sessionmaker
+import os
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from dotenv import load_dotenv
 
-DATABASE_URL = "mysql+mysqlconnector://root:chavesnobre12@localhost/marketplace_agro"
+load_dotenv()
 
 metadata_obj = MetaData()
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class Base(DeclarativeBase):
     metadata = metadata_obj
+
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+
+if not DATABASE_URL:
+    raise EnvironmentError(
+        "ERRO: DATABASE_URL não foi definida.Crie um arquivo .env na raiz do projeto."
+    )
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

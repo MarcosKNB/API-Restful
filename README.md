@@ -62,5 +62,3 @@ As rotas cadastradas no projeto estão em `app/rotas/`:
 1. Se o erro de `ColumnElement[bool]` persistir, envie o arquivo que implementa a dependência de usuário atual (por exemplo, `app/deps.py` ou `app/security.py`) e eu corrijo a lógica.
 
 ---
-
-Se quiser, eu já aplico a remoção da linha redundante em `app/main.py` e/ou corrijo a dependência que produz o `ColumnElement[bool]` — diga qual opção prefere.
